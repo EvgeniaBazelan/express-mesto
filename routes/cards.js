@@ -5,12 +5,18 @@ const { createCard } = require('../controllers/cards');
 const { deleteCardById } = require('../controllers/cards');
 const { likeCard } = require('../controllers/cards');
 const { dislikeCard } = require('../controllers/cards');
+const NotFound = require('../controllers/errors');
 
 router.get('/', getCards);
 router.post('/', createCard);
 router.delete('/:id', deleteCardById);
 router.put('/:id/likes', likeCard);
 router.delete('/:id/likes', dislikeCard);
+router.use((req, res) => {
+  res.status(NotFound).send({ message: 'ресурс не найден' });
+});
+
+module.exports = router;
 
 // router.get('/', (req, res) => {
 //   Card.find({})
@@ -47,4 +53,3 @@ router.delete('/:id/likes', dislikeCard);
 // router.use((req, res) => {
 //   res.status(404).send({ ... });
 // }
-module.exports = router;

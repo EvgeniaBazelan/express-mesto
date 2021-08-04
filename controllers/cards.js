@@ -4,11 +4,11 @@ const { BadRequest, NotFound, InternalServerError } = require('./errors');
 module.exports.getCards = (req, res) => {
   Card.find({})
     .then((cards) => res.send({ data: cards }))
-    .catch(() => {
-      if (res.status === BadRequest) {
-        res.status(BadRequest).send({ message: 'Переданы некорректные данные' });
+    .catch((err) => {
+      if (err.name === 'Bad Request') {
+        err.status(BadRequest).send({ message: 'Переданы некорректные данные' });
       }
-      res.status(InternalServerError).send({ message: 'Произошла ошибка' });
+      err.status(InternalServerError).send({ message: 'Произошла ошибка' });
     });
 };
 // module.exports.getCard = (req, res) => {
@@ -21,11 +21,11 @@ module.exports.createCard = (req, res) => {
   const ownerId = req.user._id;
   Card.create({ name, link, owner: ownerId })
     .then((card) => res.send({ data: card }))
-    .catch(() => {
-      if (res.status === BadRequest) {
-        res.status(BadRequest).send({ message: 'Переданы некорректные данные' });
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        err.status(BadRequest).send({ message: 'Переданы некорректные данные' });
       }
-      res.status(InternalServerError).send({ message: 'Произошла ошибка' });
+      err.status(InternalServerError).send({ message: 'Произошла ошибка' });
     });
 };
 module.exports.likeCard = (req, res) => Card.findByIdAndUpdate(
@@ -34,11 +34,11 @@ module.exports.likeCard = (req, res) => Card.findByIdAndUpdate(
   { new: true },
 )
   .then((card) => res.send(card))
-  .catch(() => {
-    if (res.status === BadRequest) {
-      res.status(BadRequest).send({ message: 'Переданы некорректные данные' });
+  .catch((err) => {
+    if (err.name === 'CastError') {
+      err.status(BadRequest).send({ message: 'Переданы некорректные данные' });
     }
-    res.status(InternalServerError).send({ message: 'Произошла ошибка' });
+    err.status(InternalServerError).send({ message: 'Произошла ошибка' });
   });
 
 module.exports.dislikeCard = (req, res) => Card.findByIdAndUpdate(
@@ -47,11 +47,11 @@ module.exports.dislikeCard = (req, res) => Card.findByIdAndUpdate(
   { new: true },
 )
   .then((card) => res.send(card))
-  .catch(() => {
-    if (res.status === BadRequest) {
-      res.status(BadRequest).send({ message: 'Переданы некорректные данные' });
+  .catch((err) => {
+    if (err.name === 'CastError') {
+      err.status(BadRequest).send({ message: 'Переданы некорректные данные' });
     }
-    res.status(InternalServerError).send({ message: 'Произошла ошибка' });
+    err.status(InternalServerError).send({ message: 'Произошла ошибка' });
   });
 module.exports.deleteCardById = (req, res) => Card.findById(req.params.id)
   .then((card) => {
@@ -62,11 +62,11 @@ module.exports.deleteCardById = (req, res) => Card.findById(req.params.id)
         .then((card) => {
           res.send(card);
         })
-        .catch(() => {
-          if (res.status === NotFound) {
-            res.status(NotFound).send({ message: ' Карточка с указанным _id не найдена.' });
+        .catch((err) => {
+          if (err.name === 'Not Found') {
+            err.status(NotFound).send({ message: ' Карточка с указанным _id не найдена.' });
           }
-          res.status(InternalServerError).send({ message: 'Произошла ошибка' });
+          err.status(InternalServerError).send({ message: 'Произошла ошибка' });
         });
     }
   });
