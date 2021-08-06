@@ -1,8 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
-
 // eslint-disable-next-line import/no-extraneous-dependencies
 const bodyParser = require('body-parser');
+const NotFound = require('./errors/NotFound');
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -28,5 +28,9 @@ app.use((req, res, next) => {
 
 app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));
+
+app.use((req) => {
+  throw new NotFound(`По адресу ${req.path} ничего нет`);
+});
 
 app.listen(PORT);

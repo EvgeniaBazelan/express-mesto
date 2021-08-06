@@ -3,7 +3,6 @@ const router = require('express').Router();
 const {
   getUsers, getUser, createUser, updateUser, updateUserAvatar,
 } = require('../controllers/users');
-const NotFound = require('../controllers/errors');
 
 router.get('/', getUsers);
 // router.get('/me', updateUser);
@@ -11,9 +10,6 @@ router.patch('/me', updateUser);
 router.post('/', createUser);
 router.get('/:id', getUser);
 router.patch('/me/avatar', updateUserAvatar);
-router.use((req, res) => {
-  res.status(NotFound).send({ message: 'ресурс не найден' });
-});
 
 module.exports = router;
 
