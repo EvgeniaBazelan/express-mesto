@@ -13,39 +13,3 @@ router.put('/:id/likes', likeCard);
 router.delete('/:id/likes', dislikeCard);
 
 module.exports = router;
-
-// router.get('/', (req, res) => {
-//   Card.find({})
-//     // eslint-disable-next-line no-unused-vars,no-undef
-//     .then((cards) => res.send({ data: cards }))
-//     .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
-// });
-// router.get('/:cardId', (req, res) => {
-//   Card.findById(req.params.id)
-//     .then((card) => res.send({ data: card }))
-//     .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
-// });
-//
-// // сработает при POST-запросе на URL /films
-// router.post('/', (req, res) => {
-//   const { name, link } = req.body;
-//   Card.create({ name, link })
-//     .then((card) => res.send({ data: card }))
-//     .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
-// });
-// router.put('/:id/likes', (req, res) => {
-//   Card.findByIdAndUpdate(
-//     req.params.cardId,
-//     { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
-//     { new: true },)
-// });
-// router.delete('/:id/likes', (req, res) => {
-//   Card.findByIdAndUpdate(
-//     req.params.cardId,
-//     { $pull: { likes: req.user._id } }, // убрать _id из массива
-//     { new: true },
-//   )
-// });
-// router.use((req, res) => {
-//   res.status(404).send({ ... });
-// }
