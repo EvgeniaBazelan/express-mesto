@@ -20,7 +20,7 @@ const createCard = (req, res) => {
     .then((card) => res.status(200).send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new BadRequest('Вы не заполнили обязательные поля или данные не верны');
+        err.status(BadRequest).send({ message: 'Вы не заполнили обязательные поля или данные не верны' });
       }
     })
     .catch((err) => {
@@ -31,7 +31,7 @@ const createCard = (req, res) => {
 const deleteCardById = (req, res) => {
   Card.findById(req.params.id)
     .orFail(() => {
-      throw new NotFound('Карточка с таким id не найдена!');
+      res.status(NotFound).send({ message: 'Карточка с таким id не найдена!' });
     })
     .then((card) => {
       if (card.owner._id.toString() === req.user._id) {
@@ -42,14 +42,15 @@ const deleteCardById = (req, res) => {
           })
           .catch((err) => {
             if (err.name === 'CastError') {
-              throw new BadRequest('Неправильный id');
+              err.status(BadRequest)
+                .send({ message: 'Неправильный id' });
             }
           })
           .catch((err) => {
             err.status(500).send({ message: 'Произошла ошибка' });
           });
       } else {
-        throw new Forbidden('Недостаточно прав для удаления карточки');
+        res.status(Forbidden).send({ message: 'Недостаточно прав для удаления карточки' });
       }
       return res.status(200).send({ message: 'Карточка удалена' });
     })
@@ -61,7 +62,7 @@ const deleteCardById = (req, res) => {
 const likeCard = (req, res) => {
   Card.findById(req.params.id)
     .orFail(() => {
-      throw new NotFound('Карточка с таким id не найдена!');
+      res.status(NotFound).send({ message: 'Карточка с таким id не найдена!' });
     })
     // eslint-disable-next-line no-unused-vars
     .then((card) => {
@@ -74,7 +75,7 @@ const likeCard = (req, res) => {
         .then((card) => res.send(card))
         .catch((err) => {
           if (err.name === 'CastError') {
-            throw new BadRequest('Ошибка валидации данных');
+            err.status(BadRequest).send({ message: 'Ошибка валидации данных' });
           }
         })
         .catch((err) => {
@@ -89,7 +90,7 @@ const likeCard = (req, res) => {
 const dislikeCard = (req, res) => {
   Card.findById(req.params.id)
     .orFail(() => {
-      throw new NotFound('Карточка с таким id не найдена!');
+      res.status(NotFound).send({ message: 'Карточка с таким id не найдена!' });
     })
     // eslint-disable-next-line no-unused-vars
     .then((card) => {
@@ -102,7 +103,7 @@ const dislikeCard = (req, res) => {
         .then((card) => res.send(card))
         .catch((err) => {
           if (err.name === 'CastError') {
-            throw new BadRequest('Неправильный id');
+            err.status(BadRequest).send({ message: 'Неправильный id' });
           }
         })
         .catch((err) => {

@@ -8,7 +8,7 @@ module.exports.getUsers = (req, res) => {
     .then((users) => res.send({ data: users }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new BadRequest('Ошибка при получении пользователей');
+        err.status(BadRequest).send({ message: 'Ошибка при получении пользователей' });
       }
       err.status(500).send({ message: 'Произошла ошибка' });
     });
@@ -16,14 +16,14 @@ module.exports.getUsers = (req, res) => {
 module.exports.getUserId = (req, res) => {
   User.findById(req.params.id)
     .orFail(() => {
-      throw new NotFound('Пользователь с таким Id не существует');
+      res.status(NotFound).send({ message: 'Пользователь с таким Id не существует' });
     })
     .then(({ _id }) => {
       User.findById(_id)
         .then((user) => res.send(user))
         .catch((err) => {
           if (err.name === 'CastError') {
-            throw new BadRequest('Неправильный id');
+            err.status(BadRequest).send({ message: 'Неправильный id' });
           }
         })
         .catch((err) => {
@@ -41,7 +41,7 @@ module.exports.createUser = (req, res) => {
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new BadRequest('Ошибка при создании пользователя');
+        err.status(BadRequest)({ message: 'Ошибка при создании пользователя' });
       }
       err.status(500).send({ message: 'Произошла ошибка' });
     });
@@ -52,12 +52,12 @@ module.exports.updateUser = (req, res) => {
 
   User.findByIdAndUpdate(id, { name, about })
     .orFail(() => {
-      throw new NotFound('Пользователь с таким Id не существует');
+      res.status(NotFound).send({ message: 'Пользователь с таким Id не существует' });
     })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
-        throw new BadRequest('Данные пользователя не корректны');
+        err.status(BadRequest).send({ message: 'Данные пользователя не корректны' });
       } else if (err.name === 'Not Found') {
         err.status(NotFound).send({ message: 'Пользователь по указанному _id не найден' });
       }
@@ -70,14 +70,14 @@ module.exports.updateUserAvatar = (req, res) => {
 
   User.findByIdAndUpdate(id, { avatar })
     .orFail(() => {
-      throw new NotFound('Пользователь с таким Id не существует');
+      res.status(NotFound).send({ message: 'Пользователь с таким Id не существует' });
     })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new BadRequest('Ссылка на аватар не корректна');
+        err.status(BadRequest).send({ message: 'Ссылка на аватар не корректна' });
       } else if (err.name === 'CastError') {
-        throw new BadRequest('Id не корректен');
+        err.status(BadRequest).send({ message: 'Id не корректен' });
       }
       err.status(500).send({ message: 'Произошла ошибка' });
     });

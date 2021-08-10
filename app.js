@@ -29,8 +29,8 @@ app.use((req, res, next) => {
 app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));
 
-app.use((req) => {
-  throw new NotFound(`По адресу ${req.path} ничего нет`);
+app.use((req, res) => {
+  res.status(NotFound).send({ message: `По адресу ${req.path} ничего нет` });
 });
 
 app.listen(PORT);
