@@ -7,9 +7,7 @@ const Forbidden = require('../errors/Forbidden');
 const getCards = (req, res) => {
   Card.find({})
     .then((cards) => res.send(cards))
-    .catch((err) => {
-      err.status(500).send({ message: 'Произошла ошибка' });
-    });
+    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
 };
 
 const createCard = (req, res) => {
@@ -18,14 +16,13 @@ const createCard = (req, res) => {
 
   Card.create({ name, link, owner: ownerId })
     .then((card) => res.status(200).send(card))
+    // eslint-disable-next-line consistent-return
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        err.status(BadRequest).send({ message: 'Вы не заполнили обязательные поля или данные не верны' });
+        return res.status(BadRequest).send({ message: 'Вы не заполнили обязательные поля или данные не верны' });
       }
     })
-    .catch((err) => {
-      err.status(500).send({ message: 'Произошла ошибка' });
-    });
+    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
 };
 
 const deleteCardById = (req, res) => {
@@ -40,23 +37,20 @@ const deleteCardById = (req, res) => {
           .then((card) => {
             res.send(card);
           })
+          // eslint-disable-next-line consistent-return
           .catch((err) => {
             if (err.name === 'CastError') {
-              err.status(BadRequest)
+              return res.status(BadRequest)
                 .send({ message: 'Неправильный id' });
             }
           })
-          .catch((err) => {
-            err.status(500).send({ message: 'Произошла ошибка' });
-          });
+          .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
       } else {
-        res.status(Forbidden).send({ message: 'Недостаточно прав для удаления карточки' });
+        return res.status(Forbidden).send({ message: 'Недостаточно прав для удаления карточки' });
       }
       return res.status(200).send({ message: 'Карточка удалена' });
     })
-    .catch((err) => {
-      err.status(500).send({ message: 'Произошла ошибка' });
-    });
+    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
 };
 
 const likeCard = (req, res) => {
@@ -73,18 +67,15 @@ const likeCard = (req, res) => {
       )
         // eslint-disable-next-line no-shadow
         .then((card) => res.send(card))
+        // eslint-disable-next-line consistent-return
         .catch((err) => {
           if (err.name === 'CastError') {
-            err.status(BadRequest).send({ message: 'Ошибка валидации данных' });
+            return res.status(BadRequest).send({ message: 'Ошибка валидации данных' });
           }
         })
-        .catch((err) => {
-          err.status(500).send({ message: 'Произошла ошибка' });
-        });
+        .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
     })
-    .catch((err) => {
-      err.status(500).send({ message: 'Произошла ошибка' });
-    });
+    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
 };
 
 const dislikeCard = (req, res) => {
@@ -101,18 +92,15 @@ const dislikeCard = (req, res) => {
       )
         // eslint-disable-next-line no-shadow
         .then((card) => res.send(card))
+        // eslint-disable-next-line consistent-return
         .catch((err) => {
           if (err.name === 'CastError') {
-            err.status(BadRequest).send({ message: 'Неправильный id' });
+            return res.status(BadRequest).send({ message: 'Неправильный id' });
           }
         })
-        .catch((err) => {
-          err.status(500).send({ message: 'Произошла ошибка' });
-        });
+        .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
     })
-    .catch((err) => {
-      err.status(500).send({ message: 'Произошла ошибка' });
-    });
+    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
 };
 
 module.exports = {

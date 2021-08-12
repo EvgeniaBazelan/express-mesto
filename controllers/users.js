@@ -8,9 +8,9 @@ module.exports.getUsers = (req, res) => {
     .then((users) => res.send({ data: users }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        err.status(BadRequest).send({ message: 'Ошибка при получении пользователей' });
+        return res.status(BadRequest).send({ message: 'Ошибка при получении пользователей' });
       }
-      err.status(500).send({ message: 'Произошла ошибка' });
+      return res.status(500).send({ message: 'Произошла ошибка' });
     });
 };
 module.exports.getUserId = (req, res) => {
@@ -21,18 +21,15 @@ module.exports.getUserId = (req, res) => {
     .then(({ _id }) => {
       User.findById(_id)
         .then((user) => res.send(user))
+        // eslint-disable-next-line consistent-return
         .catch((err) => {
           if (err.name === 'CastError') {
-            err.status(BadRequest).send({ message: 'Неправильный id' });
+            return res.status(BadRequest).send({ message: 'Неправильный id' });
           }
         })
-        .catch((err) => {
-          err.status(500).send({ message: 'Произошла ошибка' });
-        });
+        .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
     })
-    .catch((err) => {
-      err.status(500).send({ message: 'Произошла ошибка' });
-    });
+    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
 };
 module.exports.createUser = (req, res) => {
   const { name, about, avatar } = req.body;
@@ -41,9 +38,9 @@ module.exports.createUser = (req, res) => {
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        err.status(BadRequest)({ message: 'Ошибка при создании пользователя' });
+        return res.status(BadRequest).send({ message: 'Ошибка при создании пользователя' });
       }
-      err.status(500).send({ message: 'Произошла ошибка' });
+      return res.status(500).send({ message: 'Произошла ошибка' });
     });
 };
 module.exports.updateUser = (req, res) => {
@@ -57,11 +54,11 @@ module.exports.updateUser = (req, res) => {
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
-        err.status(BadRequest).send({ message: 'Данные пользователя не корректны' });
-      } else if (err.name === 'Not Found') {
-        err.status(NotFound).send({ message: 'Пользователь по указанному _id не найден' });
+        return res.status(BadRequest).send({ message: 'Данные пользователя не корректны' });
+      } if (err.name === 'Not Found') {
+        return res.status(NotFound).send({ message: 'Пользователь по указанному _id не найден' });
       }
-      err.status(500).send({ message: 'Произошла ошибка' });
+      return res.status(500).send({ message: 'Произошла ошибка' });
     });
 };
 module.exports.updateUserAvatar = (req, res) => {
@@ -75,10 +72,10 @@ module.exports.updateUserAvatar = (req, res) => {
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        err.status(BadRequest).send({ message: 'Ссылка на аватар не корректна' });
-      } else if (err.name === 'CastError') {
-        err.status(BadRequest).send({ message: 'Id не корректен' });
+        return res.status(BadRequest).send({ message: 'Ссылка на аватар не корректна' });
+      } if (err.name === 'CastError') {
+        return res.status(BadRequest).send({ message: 'Id не корректен' });
       }
-      err.status(500).send({ message: 'Произошла ошибка' });
+      return res.status(500).send({ message: 'Произошла ошибка' });
     });
 };
