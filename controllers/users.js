@@ -2,6 +2,7 @@ const User = require('../models/user');
 
 const NotFound = require('../errors/NotFound');
 const BadRequest = require('../errors/BadRequest');
+const InternalServerError = require('../errors/InternalServerError');
 
 module.exports.getUsers = (req, res) => {
   User.find({})
@@ -10,7 +11,7 @@ module.exports.getUsers = (req, res) => {
       if (err.name === 'ValidationError') {
         return res.status(BadRequest).send({ message: 'Ошибка при получении пользователей' });
       }
-      return res.status(500).send({ message: 'Произошла ошибка' });
+      return res.status(InternalServerError).send({ message: 'Произошла ошибка' });
     });
 };
 module.exports.getUserId = (req, res) => {
@@ -27,9 +28,9 @@ module.exports.getUserId = (req, res) => {
             return res.status(BadRequest).send({ message: 'Неправильный id' });
           }
         })
-        .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+        .catch(() => res.status(InternalServerError).send({ message: 'Произошла ошибка' }));
     })
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch(() => res.status(InternalServerError).send({ message: 'Произошла ошибка' }));
 };
 module.exports.createUser = (req, res) => {
   const { name, about, avatar } = req.body;
@@ -40,7 +41,7 @@ module.exports.createUser = (req, res) => {
       if (err.name === 'ValidationError') {
         return res.status(BadRequest).send({ message: 'Ошибка при создании пользователя' });
       }
-      return res.status(500).send({ message: 'Произошла ошибка' });
+      return res.status(InternalServerError).send({ message: 'Произошла ошибка' });
     });
 };
 module.exports.updateUser = (req, res) => {
@@ -58,7 +59,7 @@ module.exports.updateUser = (req, res) => {
       } if (err.name === 'Not Found') {
         return res.status(NotFound).send({ message: 'Пользователь по указанному _id не найден' });
       }
-      return res.status(500).send({ message: 'Произошла ошибка' });
+      return res.status(InternalServerError).send({ message: 'Произошла ошибка' });
     });
 };
 module.exports.updateUserAvatar = (req, res) => {
@@ -76,6 +77,6 @@ module.exports.updateUserAvatar = (req, res) => {
       } if (err.name === 'CastError') {
         return res.status(BadRequest).send({ message: 'Id не корректен' });
       }
-      return res.status(500).send({ message: 'Произошла ошибка' });
+      return res.status(InternalServerError).send({ message: 'Произошла ошибка' });
     });
 };
