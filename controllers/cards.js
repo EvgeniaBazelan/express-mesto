@@ -1,8 +1,6 @@
 const Card = require('../models/card');
 
-// const NotFound = require('../errors/NotFound');
 const BadRequest = require('../errors/BadRequest');
-// const Forbidden = require('../errors/Forbidden');
 const InternalServerError = require('../errors/InternalServerError');
 const {
   NotFoundError,
@@ -52,12 +50,10 @@ const createCard = (req, res) => {
 };
 
 const deleteCardById = (req, res) => {
-  // noinspection JSCheckFunctionSignatures
   Card.findById(req.params.id)
     .orFail(new NotFoundError('Карточка с таким id не найдена!'))
     .then((card) => {
       if (card.owner._id.toString() === req.user._id) {
-        // noinspection JSCheckFunctionSignatures
         return Card.findByIdAndRemove(req.params.id);
       }
       throw new ForbiddenError('Недостаточно прав для удаления карточки');
@@ -68,7 +64,6 @@ const deleteCardById = (req, res) => {
 };
 
 const likeCard = (req, res) => {
-  // noinspection JSCheckFunctionSignatures
   Card.findByIdAndUpdate(
     req.params.id,
     { $addToSet: { likes: req.user } },
@@ -79,14 +74,6 @@ const likeCard = (req, res) => {
     .catch(HandleErrors(res));
 };
 
-// const dislikeCard = (req, res) => {
-// Card.findById(req.params.id)
-// .orFail(() => {
-//   res.status(NotFound)
-//     .send({ message: 'Карточка с таким id не найдена!' });
-// })
-// eslint-disable-next-line no-unused-vars
-// .then((card) => {
 const dislikeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.id,
@@ -94,22 +81,9 @@ const dislikeCard = (req, res) => {
     { new: true },
   )
     .orFail(new NotFoundError('Карточка с таким id не найдена!'))
-    // eslint-disable-next-line no-shadow
     .then((card) => res.send(card))
     .catch(HandleErrors(res));
 };
-//         .catch((err) => {
-//           if (err.name === 'CastError') {
-//             return res.status(BadRequest)
-//               .send({ message: 'Неправильный id' });
-//           }
-//           return res.status(InternalServerError)
-//             .send({ message: 'Произошла ошибка' });
-//         });
-//     })
-//     .catch(() => res.status(InternalServerError)
-//       .send({ message: 'Произошла ошибка' }));
-// };
 
 module.exports = {
   getCards,
@@ -117,4 +91,5 @@ module.exports = {
   deleteCardById,
   likeCard,
   dislikeCard,
+  HandleErrors,
 };
