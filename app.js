@@ -33,4 +33,11 @@ app.use((req, res) => {
   res.status(NotFound).send({ message: `По адресу ${req.path} ничего нет` });
 });
 
+app.use((error, req, res, next) => {
+  if (error) {
+    return res.status(500).send({ message: `unhadled error: ${error.message}` });
+  }
+  return next();
+});
+
 app.listen(PORT);
