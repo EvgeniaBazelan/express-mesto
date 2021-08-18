@@ -14,7 +14,7 @@ module.exports.getUserId = (req, res) => {
   User.findById(req.params.id)
     .orFail(new NotFoundError('Пользователь с таким Id не существует'))
     .then((user) => res.send(user))
-    .catch(handleErrors(res));
+    .catch((err) => handleErrors(res, err));
 };
 
 module.exports.createUser = (req, res) => {
@@ -46,7 +46,7 @@ module.exports.updateUser = (req, res) => {
       if (err.name === 'ValidationError') {
         return res.status(BadRequest).send({ message: 'Данные пользователя не корректны' });
       }
-      return handleErrors(res)(err);
+      return handleErrors(res, err);
     });
 };
 
@@ -61,6 +61,6 @@ module.exports.updateUserAvatar = (req, res) => {
       if (err.name === 'ValidationError') {
         return res.status(BadRequest).send({ message: 'Ссылка на аватар не корректна' });
       }
-      return handleErrors(res)(err);
+      return handleErrors(res, err);
     });
 };

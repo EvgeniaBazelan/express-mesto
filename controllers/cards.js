@@ -61,7 +61,7 @@ const deleteCardById = (req, res) => {
     })
     .then(() => res.status(200)
       .send({ message: 'Карточка удалена' }))
-    .catch(handleErrors(res));
+    .catch((err) => handleErrors(res, err));
 };
 
 const likeCard = (req, res) => {
@@ -72,7 +72,7 @@ const likeCard = (req, res) => {
   )
     .orFail(new NotFoundError('Карточка с таким id не найдена!'))
     .then((card) => res.send(card))
-    .catch(handleErrors(res));
+    .catch((err) => handleErrors(res, err));
 };
 
 const dislikeCard = (req, res) => {
@@ -83,7 +83,7 @@ const dislikeCard = (req, res) => {
   )
     .orFail(new NotFoundError('Карточка с таким id не найдена!'))
     .then((card) => res.send(card))
-    .catch(handleErrors(res));
+    .catch((err) => handleErrors(res, err));
 };
 
 module.exports = {
