@@ -12,7 +12,7 @@ function handleErrors(res, err) {
   }
   if (['NotFoundError', 'ForbiddenError'].indexOf(err.name) >= 0) {
     return res.status(err.code)
-      .send(err.message);
+      .send({ message: `${err.message}` });
   }
   return res.status(InternalServerError)
     .send({ message: 'Произошла ошибка' });

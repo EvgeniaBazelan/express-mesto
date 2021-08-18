@@ -52,12 +52,12 @@ const createCard = (req, res) => {
 
 const deleteCardById = (req, res) => {
   Card.findById(req.params.id)
-    .orFail(new NotFoundError('Карточка с таким id не найдена!'))
+    .orFail(new NotFoundError({ message: 'Карточка с таким id не найдена!' }))
     .then((card) => {
       if (card.owner._id.toString() === req.user._id) {
         return Card.findByIdAndRemove(req.params.id);
       }
-      throw new ForbiddenError('Недостаточно прав для удаления карточки');
+      throw new ForbiddenError({ message: 'Недостаточно прав для удаления карточки' });
     })
     .then(() => res.status(200)
       .send({ message: 'Карточка удалена' }))
@@ -68,9 +68,9 @@ const likeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.id,
     { $addToSet: { likes: req.user } },
-    { new: true },
+    { new: true, runValidators: true },
   )
-    .orFail(new NotFoundError('Карточка с таким id не найдена!'))
+    .orFail(new NotFoundError({ message: 'Карточка с таким id не найдена!' }))
     .then((card) => res.send(card))
     .catch((err) => handleErrors(res, err));
 };
@@ -79,9 +79,9 @@ const dislikeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.id,
     { $pull: { likes: req.user._id } },
-    { new: true },
+    { new: true, runValidators: true },
   )
-    .orFail(new NotFoundError('Карточка с таким id не найдена!'))
+    .orFail(new NotFoundError({ message: 'Карточка с таким id не найдена!' }))
     .then((card) => res.send(card))
     .catch((err) => handleErrors(res, err));
 };
