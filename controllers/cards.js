@@ -6,21 +6,22 @@ const {
   NotFoundError,
   ForbiddenError,
 } = require('../errors/Errors');
+const { handleErrors } = require('../errors/HandleErrors');
 
-function HandleErrors(res) {
-  return function (err) {
-    if (err.name === 'CastError') {
-      return res.status(BadRequest)
-        .send({ message: 'Неправильный id' });
-    }
-    if (['NotFoundError', 'ForbiddenError'].indexOf(err.name) >= 0) {
-      return res.status(err.code)
-        .send(err.message);
-    }
-    return res.status(InternalServerError)
-      .send({ message: 'Произошла ошибка' });
-  };
-}
+// function HandleErrors(res) {
+//   return function (err) {
+//     if (err.name === 'CastError') {
+//       return res.status(BadRequest)
+//         .send({ message: 'Неправильный id' });
+//     }
+//     if (['NotFoundError', 'ForbiddenError'].indexOf(err.name) >= 0) {
+//       return res.status(err.code)
+//         .send(err.message);
+//     }
+//     return res.status(InternalServerError)
+//       .send({ message: 'Произошла ошибка' });
+//   };
+// }
 
 const getCards = (req, res) => {
   Card.find({})
@@ -60,7 +61,7 @@ const deleteCardById = (req, res) => {
     })
     .then(() => res.status(200)
       .send({ message: 'Карточка удалена' }))
-    .catch(HandleErrors(res));
+    .catch(handleErrors(res));
 };
 
 const likeCard = (req, res) => {
@@ -71,7 +72,7 @@ const likeCard = (req, res) => {
   )
     .orFail(new NotFoundError('Карточка с таким id не найдена!'))
     .then((card) => res.send(card))
-    .catch(HandleErrors(res));
+    .catch(handleErrors(res));
 };
 
 const dislikeCard = (req, res) => {
@@ -82,7 +83,7 @@ const dislikeCard = (req, res) => {
   )
     .orFail(new NotFoundError('Карточка с таким id не найдена!'))
     .then((card) => res.send(card))
-    .catch(HandleErrors(res));
+    .catch(handleErrors(res));
 };
 
 module.exports = {
@@ -91,5 +92,4 @@ module.exports = {
   deleteCardById,
   likeCard,
   dislikeCard,
-  HandleErrors,
 };
