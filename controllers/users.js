@@ -12,7 +12,7 @@ module.exports.getUsers = (req, res) => {
 
 module.exports.getUserId = (req, res) => {
   User.findById(req.params.id)
-    .orFail(new NotFoundError({ message: 'Пользователь с таким Id не существует' }))
+    .orFail(new NotFoundError('Пользователь с таким Id не существует'))
     .then((user) => res.send(user))
     .catch((err) => handleErrors(res, err));
 };
@@ -40,7 +40,7 @@ module.exports.updateUser = (req, res) => {
     name,
     about,
   }, { new: true, runValidators: true })
-    .orFail(new NotFoundError({ message: 'Пользователь с таким Id не существует' }))
+    .orFail(new NotFoundError('Пользователь с таким Id не существует'))
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -55,7 +55,7 @@ module.exports.updateUserAvatar = (req, res) => {
   const { avatar } = req.body;
 
   User.findByIdAndUpdate(id, { avatar }, { new: true, runValidators: true })
-    .orFail(new NotFoundError({ message: 'Пользователь с таким Id не существует' }))
+    .orFail(new NotFoundError('Пользователь с таким Id не существует'))
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {

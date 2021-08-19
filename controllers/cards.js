@@ -52,7 +52,7 @@ const createCard = (req, res) => {
 
 const deleteCardById = (req, res) => {
   Card.findById(req.params.id)
-    .orFail(new NotFoundError({ message: 'Карточка с таким id не найдена!' }))
+    .orFail(new NotFoundError('Карточка с таким id не найдена!'))
     .then((card) => {
       if (card.owner._id.toString() === req.user._id) {
         return Card.findByIdAndRemove(req.params.id);
@@ -70,7 +70,7 @@ const likeCard = (req, res) => {
     { $addToSet: { likes: req.user } },
     { new: true, runValidators: true },
   )
-    .orFail(new NotFoundError({ message: 'Карточка с таким id не найдена!' }))
+    .orFail(new NotFoundError('Карточка с таким id не найдена!'))
     .then((card) => res.send(card))
     .catch((err) => handleErrors(res, err));
 };
@@ -81,7 +81,7 @@ const dislikeCard = (req, res) => {
     { $pull: { likes: req.user._id } },
     { new: true, runValidators: true },
   )
-    .orFail(new NotFoundError({ message: 'Карточка с таким id не найдена!' }))
+    .orFail(new NotFoundError('Карточка с таким id не найдена!'))
     .then((card) => res.send(card))
     .catch((err) => handleErrors(res, err));
 };
