@@ -57,7 +57,7 @@ const deleteCardById = (req, res) => {
       if (card.owner._id.toString() === req.user._id) {
         return Card.findByIdAndRemove(req.params.id);
       }
-      throw new ForbiddenError({ message: 'Недостаточно прав для удаления карточки' });
+      throw new ForbiddenError('Недостаточно прав для удаления карточки');
     })
     .then(() => res.status(200)
       .send({ message: 'Карточка удалена' }))
