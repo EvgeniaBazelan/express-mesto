@@ -1,11 +1,16 @@
 const express = require('express');
 const mongoose = require('mongoose');
-// eslint-disable-next-line import/no-extraneous-dependencies
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
+const auth = require('./middlewares/auth');
+const { login, createUser } = require('./controllers/users');
 const NotFound = require('./errors/NotFound');
+const { validateSigIn, validateSigUp } = require('./middlewares/Validation');
+const { handleErrors } = require('./errors/HandleErrors');
 
 const { PORT = 3000 } = process.env;
 const app = express();
+app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 // mongoose.connect('mongodb://localhost:27017/mestodb', {
@@ -18,26 +23,22 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useFindAndModify: false,
   useUnifiedTopology: true,
 });
+// app.use(errors);
+app.post('/signup', validateSigUp, createUser);
+app.post('/signin', validateSigIn, login);
+
+app.use('/users', auth, require('./routes/users'));
+app.use('/cards', auth, require('./routes/cards'));
+
 app.use((req, res, next) => {
-  req.user = {
-    _id: '61018a3f483f820c605e2524', // вставьте сюда _id созданного в предыдущем пункте пользователя
-  };
-
-  next();
+  next(new NotFound(`По адресу ${req.path} ничего нет`));
 });
 
-app.use('/users', require('./routes/users'));
-app.use('/cards', require('./routes/cards'));
-
-app.use((req, res) => {
-  res.status(NotFound).send({ message: `По адресу ${req.path} ничего нет` });
+app.use((err, req, res, next) => {
+  if (err) {
+    return handleErrors(res, err);
+  }
+  return next();
 });
-
-// app.use((error, req, res, next) => {
-//   if (error) {
-//     return res.status(500).send({ message: `unhadled error: ${error.message}` });
-//   }
-//   return next();
-// });
 
 app.listen(PORT);

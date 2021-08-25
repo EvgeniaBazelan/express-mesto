@@ -1,20 +1,21 @@
-const BadRequest = require('./BadRequest');
-const InternalServerError = require('./InternalServerError');
-// const {
-//   NotFoundError,
-//   ForbiddenError,
-// } = require('./Errors');
+const { isCelebrateError } = require('celebrate');
 
 function handleErrors(res, err) {
-  if (err.name === 'CastError') {
-    return res.status(BadRequest)
-      .send({ message: 'Неправильный id' });
+  if (isCelebrateError(err)) {
+    if (!err.details.get('body') && err.details.get('params')) {
+      return res.status(400).send({ message: err.details.get('params').message });
+    }
+    return res.status(400).send({ message: err.details.get('body').message });
   }
-  if (['NotFoundError', 'ForbiddenError'].indexOf(err.name) >= 0) {
-    return res.status(err.code)
+  if (err.name === 'CastError') {
+    return res.status(400)
       .send({ message: `${err.message}` });
   }
-  return res.status(InternalServerError)
+  if (['NotFound', 'Forbidden', 'BadRequest', 'Unauthorized', 'ConflictingRequest'].indexOf(err.name) >= 0) {
+    return res.status(err.statusCode)
+      .send({ message: `${err.message}` });
+  }
+  return res.status(500)
     .send({ message: 'Произошла ошибка' });
 }
 

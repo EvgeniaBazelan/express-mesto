@@ -1,12 +1,9 @@
 const Card = require('../models/card');
-
 const BadRequest = require('../errors/BadRequest');
-const InternalServerError = require('../errors/InternalServerError');
-const {
-  NotFoundError,
-  ForbiddenError,
-} = require('../errors/Errors');
-const { handleErrors } = require('../errors/HandleErrors');
+const NotFound = require('../errors/NotFound');
+const Forbidden = require('../errors/Forbidden');
+
+// const { handleErrors } = require('../errors/HandleErrors');
 
 // function HandleErrors(res) {
 //   return function (err) {
@@ -23,67 +20,75 @@ const { handleErrors } = require('../errors/HandleErrors');
 //   };
 // }
 
-const getCards = (req, res) => {
+const getCards = (req, res, next) => {
   Card.find({})
     .then((cards) => res.send(cards))
-    .catch(() => res.status(InternalServerError)
-      .send({ message: 'Произошла ошибка' }));
+    .catch(next);
 };
 
-const createCard = (req, res) => {
-  const {
-    name,
-    link,
-  } = req.body;
+const createCard = (req, res, next) => {
+  const { name, link } = req.body;
   const ownerId = req.user._id;
-  Card.create({
-    name,
-    link,
-    owner: ownerId,
-  })
+
+  Card.create({ name, link, owner: ownerId })
     .then((card) => res.status(200).send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(BadRequest).send({ message: 'Вы не заполнили обязательные поля или данные не верны' });
+        throw new BadRequest('Вы не заполнили обязательные поля или данные не верны');
       }
-      return res.status(InternalServerError).send({ message: 'Произошла ошибка' });
-    });
+    })
+    .catch(next);
 };
 
-const deleteCardById = (req, res) => {
+const deleteCardById = (req, res, next) => {
   Card.findById(req.params.id)
-    .orFail(new NotFoundError('Карточка с таким id не найдена!'))
+    .orFail(new NotFound('Карточка с таким id не найдена!'))
     .then((card) => {
       if (card.owner._id.toString() === req.user._id) {
-        return Card.findByIdAndRemove(req.params.id);
+        Card.findByIdAndRemove(req.params.id)
+          // eslint-disable-next-line no-shadow
+          .then((card) => {
+            res.send(card);
+          });
+      } else {
+        return next(new Forbidden('Недостаточно прав для удаления карточки'));
       }
-      throw new ForbiddenError('Недостаточно прав для удаления карточки');
+      return res.status(200).send({ message: 'Карточка удалена' });
     })
-    .then(() => res.status(200)
-      .send({ message: 'Карточка удалена' }))
-    .catch((err) => handleErrors(res, err));
+    .catch(next);
 };
 
-const likeCard = (req, res) => {
+const likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.id,
     { $addToSet: { likes: req.user } },
     { new: true, runValidators: true },
   )
-    .orFail(new NotFoundError('Карточка с таким id не найдена!'))
+    .orFail(new NotFound('Карточка с таким id не найдена!'))
     .then((card) => res.send(card))
-    .catch((err) => handleErrors(res, err));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        return next(new BadRequest('Ошибка валидации данных'));
+      }
+      return next();
+    });
 };
 
-const dislikeCard = (req, res) => {
+const dislikeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.id,
     { $pull: { likes: req.user._id } },
     { new: true, runValidators: true },
   )
-    .orFail(new NotFoundError('Карточка с таким id не найдена!'))
+    .orFail(new NotFound('Карточка с таким id не найдена!'))
     .then((card) => res.send(card))
-    .catch((err) => handleErrors(res, err));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        throw new BadRequest('Ошибка валидации данных');
+      }
+      return next(err);
+    })
+    .catch(next);
 };
 
 module.exports = {
