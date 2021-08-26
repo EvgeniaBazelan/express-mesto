@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 
-// напишите код здесь
 const cardSchema = new mongoose.Schema({
   name: {
     type: String,

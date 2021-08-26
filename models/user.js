@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const isEmail = require('validator/lib/isEmail');
 const validator = require('validator');
 const Unauthorized = require('../errors/Unauthorized');
-// напишите код здесь
+
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -38,7 +38,6 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
-    // select: false,
   },
 });
 

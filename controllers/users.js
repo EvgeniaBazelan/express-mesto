@@ -6,7 +6,6 @@ const NotFound = require('../errors/NotFound');
 const ConflictingRequest = require('../errors/ConflictingRequest');
 const Unauthorized = require('../errors/Unauthorized');
 const Forbidden = require('../errors/Forbidden');
-// const { handleErrors } = require('../errors/HandleErrors');
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
@@ -52,28 +51,6 @@ module.exports.createUser = (req, res, next) => {
     .catch(next);
 };
 
-// module.exports.createUser = (req, res, next) => {
-//   const {
-//     name, about, avatar, email, password,
-//   } = req.body;
-//
-//   bcrypt.hash(password, 10)
-//     .then((hash) => User.create({
-//       name, about, avatar, email, password: hash,
-//     }))
-//     .then((({ _id }) => User.findById(_id)))
-//     .then((user) => {
-//       res.status(201).send(user.toJSON());
-//     })
-//     .catch((err) => {
-//       if (err.name === 'ValidationError') {
-//         throw new BadRequest('Ошибка при создании пользователя');
-//       } else if (err.name === 'MongoError' && err.code === 11000) {
-//         throw new ConflictingRequest('Пользователь с таким E-mail уже существует');
-//       }
-//     })
-//     .catch(next);
-// };
 module.exports.updateUser = (req, res, next) => {
   const id = req.user._id;
   const {
